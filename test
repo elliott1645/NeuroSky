@@ -1,0 +1,39 @@
+import socket
+import json
+from copy import copy
+sock = socket.socket()
+sock.connect(("127.0.0.1", 13854))
+msg = json.dumps({"enableRawOutput": False, "format": "Json"})
+
+#sock.listen()
+#msg = json.dumps({"appName":"Brainwave Shooters","appKey":"9f54141b4b4c567c558d3a76cb8d715cbde03096"})
+
+#json.dumps({"isAuthorized":True})
+
+def handle_msg(msg):
+    try:
+        j = json.loads(msg)
+        if 'blinkStrength' in j.keys():
+            print(j)
+    except Exception as e:
+        pass
+
+
+sock.send(bytes(msg,"UTF-8"))
+pool = ""
+while True:
+    pool = pool + sock.recv(1024).decode("ascii")
+    for i,c in enumerate(copy(pool)):
+        if c == '\r':
+            msg = pool[0:i]
+            pool = pool[i+1:]
+            handle_msg(msg)
+#    try:
+#        j = json.loads(data.decode("ascii"))
+#        if 'blinkStrength' in j.keys():
+#            print(j)
+#    except ValueError:
+#        print(data)
+
+
+
